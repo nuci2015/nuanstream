@@ -1,8 +1,9 @@
 plugins {
     id("com.android.library")
     id("kotlin-android")
-    id("com.lagradost.cloudstream3.gradle")
 }
+
+apply(plugin = "com.lagradost.cloudstream3.gradle")
 
 android {
     namespace = "com.lagradost.cloudstream3.plugins.cb01"
@@ -34,4 +35,5 @@ cloudstream {
 
 dependencies {
     implementation(kotlin("stdlib"))
+    compileOnly("com.github.recloudstream:cloudstream:pre-release")
 }
