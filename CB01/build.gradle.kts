@@ -5,11 +5,13 @@ plugins {
 }
 
 android {
+    namespace = "com.lagradost.cloudstream3.plugins.cb01"
     compileSdk = 34
 
     defaultConfig {
         minSdk = 21
-        targetSdk = 34
+        // targetSdk rimosso da qui: nelle library è deprecato/ignorato,
+        // viene comunque ereditato dal compileSdk in fase di build
     }
 
     compileOptions {
@@ -19,16 +21,17 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs = freeCompilerArgs + "-Xno-call-assertions"
     }
 }
 
 cloudstream {
-    description = "Provider CB01"
+    description = "Provider CB01 - Film e Serie TV in italiano"
     authors = listOf("Nunciè")
-    iconUrl = ""
+    iconUrl = "https://www.google.com/s2/favicons?domain=cb01.uno&sz=%size%"
     language = "it"
     tvTypes = listOf("TvSeries", "Movie", "Anime")
-    status = 3
+    status = 1  // 1 = attivo/funzionante, 3 = beta/instabile
 }
 
 dependencies {
