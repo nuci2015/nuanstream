@@ -1,9 +1,8 @@
 plugins {
     id("com.android.library")
     id("kotlin-android")
+    id("com.lagradost.cloudstream3.gradle")
 }
-
-apply(plugin = "com.lagradost.cloudstream3.gradle")
 
 android {
     namespace = "com.lagradost.cloudstream3.plugins.cb01"
@@ -25,6 +24,7 @@ android {
 }
 
 cloudstream {
+    setID("CB01")
     description = "Provider CB01 - Film e Serie TV in italiano"
     authors = listOf("Nunciè")
     iconUrl = "https://www.google.com/s2/favicons?domain=cb01.uno&sz=%size%"
@@ -35,5 +35,4 @@ cloudstream {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    compileOnly("com.github.recloudstream:cloudstream:pre-release")
 }
