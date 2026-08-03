@@ -9,7 +9,7 @@ apply(plugin = "com.lagradost.cloudstream3.gradle")
 
 android {
     namespace = "com.lagradost.cloudstream3.plugins.cb01"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 21
