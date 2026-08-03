@@ -27,10 +27,10 @@ jobs:
     - name: Build with Gradle
       run: gradle makePlugins
 
-    - name: Upload build output
-      uses: actions/upload-artifact@v4
+    - name: Deploy to Builds Branch
+      uses: peaceiris/actions-gh-pages@v3
       with:
-        name: plugins
-        path: |
-          .plugin/
-          build/
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./repo # Assicurati che corrisponda alla cartella di output del tuo build Gradle
+        publish_branch: builds
+        force_orphan: true
