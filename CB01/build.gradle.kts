@@ -10,8 +10,6 @@ android {
 
     defaultConfig {
         minSdk = 21
-        // targetSdk rimosso da qui: nelle library è deprecato/ignorato,
-        // viene comunque ereditato dal compileSdk in fase di build
     }
 
     compileOptions {
@@ -31,7 +29,7 @@ cloudstream {
     iconUrl = "https://www.google.com/s2/favicons?domain=cb01.uno&sz=%size%"
     language = "it"
     tvTypes = listOf("TvSeries", "Movie", "Anime")
-    status = 1  // 1 = attivo/funzionante, 3 = beta/instabile
+    status = 1
 }
 
 dependencies {
