@@ -31,6 +31,6 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./repo # Assicurati che corrisponda alla cartella di output del tuo build Gradle
+        publish_dir: ./repo
         publish_branch: builds
         force_orphan: true
