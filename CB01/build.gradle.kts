@@ -5,7 +5,6 @@ plugins {
 }
 
 cloudstream {
-    // Parametri del plugin
     id = "cb01"
     name = "CB01"
     authors = ["Nuci2015"]
@@ -31,6 +30,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.core.ktx)
-    // Le dipendenze standard di Cloudstream vengono gestite automaticamente dal plugin
+    implementation("androidx.core:core-ktx:1.12.0")
 }
+
