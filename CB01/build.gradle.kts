@@ -11,7 +11,6 @@ cloudstream {
     language = "it"
     tvTypes = listOf("TvSeries", "Movie", "Anime")
     status = 3
-    apiVersion = 3
 }
 
 dependencies {
