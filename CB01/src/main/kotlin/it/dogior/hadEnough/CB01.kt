@@ -29,7 +29,7 @@ class CB01 : MainAPI() {
                 }
             }
         }
-        return HomePageResponse(arrayListOf(HomePageList("Film e Serie TV", home)))
+        return newHomePageResponse(listOf(HomePageList("Film e Serie TV", home)))
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
@@ -60,12 +60,16 @@ class CB01 : MainAPI() {
         val isMovie = !url.contains("serie")
 
         val episodes = if (isMovie) {
-            listOf(Episode(url, name = title))
+            listOf(newEpisode(url) {
+                this.name = title
+            })
         } else {
             document.select("div.episodelist a").map {
                 val epName = it.text()
                 val epUrl = it.attr("href")
-                Episode(epUrl, name = epName)
+                newEpisode(epUrl) {
+                    this.name = epName
+                }
             }
         }
 
