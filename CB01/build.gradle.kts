@@ -5,12 +5,11 @@ plugins {
 }
 
 cloudstream {
-    setEnglish(false)
     description = "Provider CB01"
-    authors = arrayOf("Nunciè")
+    authors = listOf("Nunciè")
     iconUrl = ""
     language = "it"
-    tvTypes = arrayOf("TvSeries", "Movie", "Anime")
+    tvTypes = listOf("TvSeries", "Movie", "Anime")
     status = 3
     apiVersion = 3
 }
