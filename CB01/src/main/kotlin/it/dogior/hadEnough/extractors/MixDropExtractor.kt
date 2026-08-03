@@ -1,4 +1,4 @@
-Package it.dogior.hadEnough.extractors
+package it.dogior.hadEnough.extractors
 
 import android.annotation.SuppressLint
 import android.app.Application
@@ -22,159 +22,158 @@ import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 
 class MixDropExtractor : ExtractorApi() {
-    Override val name = "MixDrop"
-    Override val mainUrl = "https://cb01uno.bond"
-    Override val requiresReferer = false
+    override val name = "MixDrop"
+    override val mainUrl = "https://cb01uno.bond"
+    override val requiresReferer = false
 
-    Companion object {
-        Private const val TAG = "MixDropExtractor"
-        Private const val TIMEOUT_SECONDS = 30L
+    companion object {
+        private const val TAG = "MixDropExtractor"
+        private const val TIMEOUT_SECONDS = 30L
         
-        Private fun getApplicationContext(): Context? {
-            Return try {
-                Val activityThreadClass = Class.forName("android.app.ActivityThread")
-                Val currentActivityThreadMethod = activityThreadClass.getMethod("currentActivityThread")
-                Val activityThread = currentActivityThreadMethod.invoke(null)
-                Val getApplicationMethod = activityThreadClass.getMethod("getApplication")
-                GetApplicationMethod.invoke(activityThread) as? Application
+        private fun getApplicationContext(): Context? {
+            return try {
+                val activityThreadClass = Class.forName("android.app.ActivityThread")
+                val currentActivityThreadMethod = activityThreadClass.getMethod("currentActivityThread")
+                val activityThread = currentActivityThreadMethod.invoke(null)
+                val getApplicationMethod = activityThreadClass.getMethod("getApplication")
+                getApplicationMethod.invoke(activityThread) as? Application
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to get Application context: ${e.message}")
-                Null
+                null
             }
         }
         
-        Private fun isVideoUrl(url: String): Boolean {
-            Val lowerUrl = url.lowercase()
-            Return lowerUrl.contains(".mp4") || 
-                   LowerUrl.contains(".m3u8") || 
-                   LowerUrl.contains("delivery") || 
-                   LowerUrl.contains("v2/hls") ||
-                   LowerUrl.contains(".ts")
+        private fun isVideoUrl(url: String): Boolean {
+            val lowerUrl = url.lowercase()
+            return lowerUrl.contains(".mp4") || 
+                   lowerUrl.contains(".m3u8") || 
+                   lowerUrl.contains("delivery") || 
+                   lowerUrl.contains("v2/hls") ||
+                   lowerUrl.contains(".ts")
         }
     }
 
-    Override suspend fun getUrl(
-        Url: String,
-        Referer: String?,
-        SubtitleCallback: (SubtitleFile) -> Unit,
-        Callback: (ExtractorLink) -> Unit,
+    override suspend fun getUrl(
+        url: String,
+        referer: String?,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit,
     ) {
-        Val baseDomain = url.substringBefore("/e/")
-        Val embedUrl = if (url.contains("/e/")) url else {
-            Val id = url.substringAfterLast("/").trim()
-            Url.replaceAfterLast("/", "e/$id")
+        val baseDomain = url.substringBefore("/e/")
+        val embedUrl = if (url.contains("/e/")) url else {
+            val id = url.substringAfterLast("/").trim()
+            url.replaceAfterLast("/", "e/$id")
         }
         
         Log.d(TAG, "Sniffing su dominio: $embedUrl")
-        Val videoUrl = extractWithWebView(embedUrl)
+        val videoUrl = extractWithWebView(embedUrl)
 
-        If (videoUrl != null) {
-            Callback.invoke(
-                NewExtractorLink(
-                    Source = name,
-                    Name = "MixDrop",
-                    Url = videoUrl,
-                    Type = ExtractorLinkType.VIDEO
+        if (videoUrl != null) {
+            callback.invoke(
+                newExtractorLink(
+                    source = name,
+                    name = "MixDrop",
+                    url = videoUrl,
+                    type = ExtractorLinkType.VIDEO
                 ) {
-                    This.headers = mapOf(
+                    this.headers = mapOf(
                         "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
                         "Accept" to "*/*"
                     )
-                    This.referer = if (baseDomain.startsWith("http")) "$baseDomain/" else "https://cb01uno.bond/"
+                    this.referer = if (baseDomain.startsWith("http")) "$baseDomain/" else "https://cb01uno.bond/"
                 }
             )
         }
     }
     
-    Private suspend fun extractWithWebView(embedUrl: String): String? {
-        Return suspendCancellableCoroutine { continuation ->
-            Val latch = CountDownLatch(1)
-            Var extractedUrl: String? = null
-            Var found = false
+    private suspend fun extractWithWebView(embedUrl: String): String? {
+        return suspendCancellableCoroutine { continuation ->
+            val latch = CountDownLatch(1)
+            var extractedUrl: String? = null
+            var found = false
             
             Handler(Looper.getMainLooper()).post {
-                Try {
-                    Val context = getApplicationContext() ?: run {
-                        Continuation.resume(null)
-                        Return@post
+                try {
+                    val context = getApplicationContext() ?: run {
+                        continuation.resume(null)
+                        return@post
                     }
                     
                     @SuppressLint("SetJavaScriptEnabled")
-                    Val webView = WebView(context)
+                    val webView = WebView(context)
                     
-                    WebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+                    webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
                     
-                    WebView.settings.apply {
-                        JavaScriptEnabled = true
-                        DomStorageEnabled = true
-                        // databaseEnabled rimossa per deprecazione (Gestito implicitamente o obsoleto nelle API recenti)
-                        JavaScriptCanOpenWindowsAutomatically = true
-                        MediaPlaybackRequiresUserGesture = false
-                        UserAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+                    webView.settings.apply {
+                        javaScriptEnabled = true
+                        domStorageEnabled = true
+                        javaScriptCanOpenWindowsAutomatically = true
+                        mediaPlaybackRequiresUserGesture = false
+                        userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
                     }
                     
-                    WebView.webViewClient = object : WebViewClient() {
-                        Override fun shouldInterceptRequest(
-                            View: WebView?,
-                            Request: WebResourceRequest?
+                    webView.webViewClient = object : WebViewClient() {
+                        override fun shouldInterceptRequest(
+                            view: WebView?,
+                            request: WebResourceRequest?
                         ): WebResourceResponse? {
-                            Val requestUrl = request?.url.toString()
+                            val requestUrl = request?.url.toString()
                             
-                            If (!found && isVideoUrl(requestUrl)) {
-                                Found = true
-                                ExtractedUrl = requestUrl
+                            if (!found && isVideoUrl(requestUrl)) {
+                                found = true
+                                extractedUrl = requestUrl
                                 Log.i(TAG, "!!! TARGET ACQUIRED !!! -> $requestUrl")
                                 
                                 Handler(Looper.getMainLooper()).post {
-                                    WebView.stopLoading()
-                                    WebView.destroy()
-                                    Latch.countDown()
-                                    Continuation.resume(requestUrl)
+                                    webView.stopLoading()
+                                    webView.destroy()
+                                    latch.countDown()
+                                    continuation.resume(requestUrl)
                                 }
-                                Return WebResourceResponse("text/plain", "utf-8", "".byteInputStream())
+                                return WebResourceResponse("text/plain", "utf-8", "".byteInputStream())
                             }
                             
-                            Return super.shouldInterceptRequest(view, request)
+                            return super.shouldInterceptRequest(view, request)
                         }
                     }
                     
-                    WebView.loadUrl(embedUrl)
+                    webView.loadUrl(embedUrl)
                     
-                    Val handler = Handler(Looper.getMainLooper())
-                    Val clicker = object : Runnable {
-                        Var count = 0
-                        Override fun run() {
-                            If (!found && count < 8) {
-                                WebView.evaluateJavascript("""
+                    val handler = Handler(Looper.getMainLooper())
+                    val clicker = object : Runnable {
+                        var count = 0
+                        override fun run() {
+                            if (!found && count < 8) {
+                                webView.evaluateJavascript("""
                                     (function() {
-                                        Var v = document.querySelector('video');
-                                        If(v) { v.muted = true; v.play(); }
-                                        Document.querySelector('.vjs-big-play-button, #vplayer, .play-button, div[id*="player"]')?.click();
+                                        var v = document.querySelector('video');
+                                        if(v) { v.muted = true; v.play(); }
+                                        document.querySelector('.vjs-big-play-button, #vplayer, .play-button, div[id*="player"]')?.click();
                                     })();
                                 """.trimIndent(), null)
-                                Count++
-                                Handler.postDelayed(this, 2000)
+                                count++
+                                handler.postDelayed(this, 2000)
                             }
                         }
                     }
-                    Handler.postDelayed(clicker, 2500)
+                    handler.postDelayed(clicker, 2500)
                     
                     Handler(Looper.getMainLooper()).postDelayed({
-                        If (!found) {
+                        if (!found) {
                             Log.w(TAG, "Timeout: Nessun link rilevato su questo dominio")
-                            WebView.stopLoading()
-                            WebView.destroy()
-                            Latch.countDown()
-                            Continuation.resume(null)
+                            webView.stopLoading()
+                            webView.destroy()
+                            latch.countDown()
+                            continuation.resume(null)
                         }
                     }, TimeUnit.SECONDS.toMillis(TIMEOUT_SECONDS))
                     
                 } catch (e: Exception) {
-                    Continuation.resume(null)
+                    continuation.resume(null)
                 }
             }
             
-            Latch.await(TIMEOUT_SECONDS + 5, TimeUnit.SECONDS)
+            latch.await(TIMEOUT_SECONDS + 5, TimeUnit.SECONDS)
         }
     }
 }
